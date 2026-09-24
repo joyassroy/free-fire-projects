@@ -11,6 +11,9 @@ export default function Home() {
         <Link href="/2" className="px-8 py-4 bg-green-500 hover:bg-green-400 text-black rounded-xl text-xl font-bold transition">
           View Graph 2 (Double Bar)
         </Link>
+        <Link href="/3" className="px-8 py-4 bg-pink-600 hover:bg-pink-500 text-white rounded-xl text-xl font-bold transition shadow-[0_0_15px_rgba(255,0,160,0.5)]">
+          View Graph 3 (Matrix Grid)
+        </Link>
       </div>
     </main>
   );

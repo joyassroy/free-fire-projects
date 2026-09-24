@@ -96,8 +96,8 @@ export default function Dashboard5() {
     if (typeof cx !== 'number' || typeof cy !== 'number') return null;
 
     const label = payload.name;
-    const badgeWidth = 84; // Increased width for better horizontal padding
-    const badgeHeight = 20; // Increased height for better vertical padding
+    const badgeWidth = 70; // Reduced width for tighter padding
+    const badgeHeight = 16; // Reduced height
     
     // Position badge so it sits right on top or right below the dot
     const badgeY = isTop ? cy - badgeHeight - 5 : cy + 5;
@@ -105,6 +105,9 @@ export default function Dashboard5() {
 
     return (
       <g>
+        {/* Pulsing Outer Ring */}
+        <circle className="animate-ping origin-center" style={{ transformOrigin: `${cx}px ${cy}px` }} cx={cx} cy={cy} r={8} fill={color} opacity={0.4} />
+        
         {/* Core Dot */}
         <circle cx={cx} cy={cy} r={4} fill={color} stroke="#111" strokeWidth={1} />
         
@@ -121,10 +124,10 @@ export default function Dashboard5() {
         {/* Text inside badge */}
         <text
           x={cx}
-          y={badgeY + 14}
+          y={badgeY + 11}
           textAnchor="middle"
           fill={textColor}
-          fontSize={10}
+          fontSize={9} // Reduced from 10 to make ASSISTS/HEADSHOTS fit perfectly
           fontWeight="900"
           className="uppercase tracking-widest"
         >

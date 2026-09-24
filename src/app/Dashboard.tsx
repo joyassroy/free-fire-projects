@@ -41,14 +41,18 @@ export default function Dashboard() {
     // Find the team data safely from our chartData array using the tick value (name)
     const teamData = chartData.find((d: any) => d.name === payload.value) || {};
 
+    const words = teamData.name ? teamData.name.split(' ') : [];
+    const line1 = words[0] || '';
+    const line2 = words.slice(1).join(' ') || '';
+
     return (
       <g transform={`translate(${x},${y})`}>
         <image
-          href={teamData.logo} // Dynamically loaded from Google Drive or Fallback
-          x={-20}
-          y={10}
-          height="40"
-          width="40"
+          href={teamData.logo}
+          x={-25} // Shifted left a bit more to center 50x50 logo
+          y={0}
+          height="50"
+          width="50"
           onError={(e: any) => {
             e.target.style.display = 'none';
           }}
@@ -58,10 +62,11 @@ export default function Dashboard() {
           y={65}
           textAnchor="middle"
           fill="#ffffff"
-          fontSize={11}
+          fontSize={10} // Reduced font size slightly
           fontWeight="bold"
         >
-          {teamData.name}
+          <tspan x="0" dy="0">{line1}</tspan>
+          {line2 && <tspan x="0" dy="12">{line2}</tspan>}
         </text>
       </g>
     );

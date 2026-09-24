@@ -38,8 +38,8 @@ export default function Dashboard() {
   chartData.sort((a: any, b: any) => b.elims - a.elims);
 
   const CustomXAxisTick = ({ x, y, payload }: any) => {
-    // payload.payload contains the full data object for this tick
-    const teamData = payload.payload;
+    // Find the team data safely from our chartData array using the tick value (name)
+    const teamData = chartData.find((d: any) => d.name === payload.value) || {};
 
     return (
       <g transform={`translate(${x},${y})`}>

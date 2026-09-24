@@ -119,7 +119,7 @@ export default function Dashboard2() {
               axisLine={false}
               tickLine={false}
               tick={{fill: '#00ffa3', fontWeight: 'bold'}}
-              tickFormatter={(value) => Math.round(value)}
+              tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => Math.max(dataMax * 1.5, 30)]}
             />
 
@@ -129,7 +129,7 @@ export default function Dashboard2() {
               axisLine={false}
               tickLine={false}
               tick={{fill: '#000', fontWeight: 'bold'}}
-              tickFormatter={(value) => Math.round(value)}
+              tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
             

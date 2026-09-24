@@ -128,6 +128,7 @@ export default function Dashboard() {
               yAxisId="left" 
               label={{ value: 'ELIMS', angle: -90, position: 'insideLeft', fill: '#ffffff', fontWeight: 'bold', offset: -10 }} 
               tick={{fill: '#ffffff80', fontSize: 14}}
+              tickFormatter={(value) => String(Math.round(value))}
               axisLine={false}
               tickLine={false}
               domain={[0, (dataMax: number) => Math.max(dataMax * 2, 30)]}
@@ -138,7 +139,7 @@ export default function Dashboard() {
               orientation="right" 
               label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: '#ffc600', fontWeight: 'bold', offset: -10 }} 
               tick={{fill: '#ffc600', fontSize: 14}}
-              tickFormatter={(value) => Math.round(value)}
+              tickFormatter={(value) => String(Math.round(value))}
               axisLine={false}
               tickLine={false}
               domain={[0, (dataMax: number) => dataMax * 1.1]}

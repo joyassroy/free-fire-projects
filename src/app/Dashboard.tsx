@@ -14,25 +14,6 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
-// Mapping Google Sheet team names to exact logo filenames
-const logoMapping: Record<string, string> = {
-  'INF': 'TEAM INFINITY',
-  'FUSION PHOENIX': 'FUSION PHOENIX',
-  'X2': 'X2 GLOBAL',
-  'TARNIX E-SPORT': 'TARNIX ESPORTS',
-  'TEAM RAGE': 'TEAM RAGE',
-  'WARRIORS ESP': 'WARRIORS ESPORTS',
-  'WARRIORS ESPORTS': 'WARRIORS ESPORTS',
-  'BANGLADESH TOP': 'BANGLADESH TOP 1',
-  'BANGLADESH TOP 1': 'BANGLADESH TOP 1',
-  'RED CLIFF': 'RED CLIFF',
-  'ELC': 'TEAM ELECTRO',
-  'FROM THE FUTU': 'FROM THE FUTURE',
-  'FROM THE FUTURE': 'FROM THE FUTURE',
-  'DVX': 'DARK VORTEX',
-  'TEC': 'TITAN ESPORTS CLUB'
-};
-
 export default function Dashboard() {
   const { data, error, isLoading } = useSWR('/api/sheet', fetcher, {
     refreshInterval: 5000,
@@ -41,19 +22,13 @@ export default function Dashboard() {
   if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-purple-400">Loading Live Stats...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
-  // Process and filter data
+  // Process data for the chart directly from the API response
   const chartData = (data?.data || [])
-    .filter((row: any) => {
-      const name = row.TeamName?.trim();
-      return name && (logoMapping[name] || Object.values(logoMapping).includes(name));
-    })
+    .filter((row: any) => row.TeamName && row.TeamName.trim() !== '')
     .map((row: any) => {
-      const originalName = row.TeamName.trim();
-      const mappedName = logoMapping[originalName] || originalName; 
-      
       return {
-        name: mappedName, // Used for XAxis and matching logo images
-        shortName: originalName, // Used to display the exact short name from the sheet
+        name: row.TeamName.trim(), // The original team name from sheet
+        logo: row.LogoUrl, // The dynamic Logo URL matched from Google Drive or fallback
         elims: parseInt(row.Kill) || 0,
         damage: parseInt(row.Damage) || 0,
       };
@@ -63,13 +38,13 @@ export default function Dashboard() {
   chartData.sort((a: any, b: any) => b.elims - a.elims);
 
   const CustomXAxisTick = ({ x, y, payload }: any) => {
-    // We get the original short name from the payload object we passed
-    const shortName = payload.payload?.shortName || payload.value;
+    // payload.payload contains the full data object for this tick
+    const teamData = payload.payload;
 
     return (
       <g transform={`translate(${x},${y})`}>
         <image
-          href={`/${payload.value}.png`}
+          href={teamData.logo} // Dynamically loaded from Google Drive or Fallback
           x={-20}
           y={10}
           height="40"
@@ -78,7 +53,6 @@ export default function Dashboard() {
             e.target.style.display = 'none';
           }}
         />
-        {/* Added team name back exactly as you requested */}
         <text
           x={0}
           y={65}
@@ -87,7 +61,7 @@ export default function Dashboard() {
           fontSize={11}
           fontWeight="bold"
         >
-          {shortName}
+          {teamData.name}
         </text>
       </g>
     );
@@ -148,7 +122,7 @@ export default function Dashboard() {
               tick={{fill: '#ffffff80', fontSize: 14}}
               axisLine={false}
               tickLine={false}
-              domain={[0, (dataMax: number) => Math.max(dataMax * 2, 30)]} // Keeps bars in the lower half
+              domain={[0, (dataMax: number) => Math.max(dataMax * 2, 30)]}
             />
             
             <YAxis 
@@ -158,7 +132,7 @@ export default function Dashboard() {
               tick={{fill: '#ffc600', fontSize: 14}}
               axisLine={false}
               tickLine={false}
-              domain={[0, (dataMax: number) => dataMax * 1.1]} // Lets the line chart scale closer to the top
+              domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
             
             <XAxis 

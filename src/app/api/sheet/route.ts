@@ -10,27 +10,36 @@ export async function GET() {
       },
       scopes: [
         'https://www.googleapis.com/auth/spreadsheets.readonly',
+        'https://www.googleapis.com/auth/drive.readonly' // Access to Drive
       ],
     });
 
     const sheets = google.sheets({ version: 'v4', auth });
+    const drive = google.drive({ version: 'v3', auth });
     
-    // As per your requirement, explicitly fetching only from Vmix sheet
-    // Row 2 to 14, Columns E to J
-    const response = await sheets.spreadsheets.values.get({
+    // 1. Fetch data from Google Sheets
+    const sheetResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
       range: 'Vmix!E2:J14', 
     });
 
-    const rows = response.data.values;
+    // 2. Fetch all images from the specific Google Drive folder
+    const driveResponse = await drive.files.list({
+      q: `'${process.env.GOOGLE_DRIVE_FOLDER_ID}' in parents and trashed = false`,
+      fields: 'files(id, name)',
+    });
+    const driveFiles = driveResponse.data.files || [];
+
+    const rows = sheetResponse.data.values;
     if (!rows || rows.length === 0) {
       return NextResponse.json({ data: [] });
     }
 
-    // Row 2 in the sheet is index 0 in the response (Headers)
     const headers = rows[0];
     
-    // Row 3 to 14 in the sheet is index 1 to 12 in the response (Data)
+    // Helper function to make matching easy (removes spaces, symbols, and converts to lowercase)
+    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
     const data = rows.slice(1).map((row) => {
       const rowData: Record<string, any> = {};
       headers.forEach((header: string, index: number) => {
@@ -38,6 +47,33 @@ export async function GET() {
           rowData[header] = row[index];
         }
       });
+
+      const teamName = rowData['TeamName'] || '';
+      const normalizedTeamName = normalize(teamName);
+      let matchedLogoUrl = null;
+
+      // 3. Match team name with Drive file names
+      for (const file of driveFiles) {
+        if (file.name) {
+          // Remove .png/.jpg extension and normalize
+          const fileNameWithoutExt = normalize(file.name.replace(/\.[^/.]+$/, ""));
+          
+          // If the sheet's team name is inside the file name or vice versa, it's a match!
+          // e.g. "X2" matches "X2 GLOBAL"
+          if (fileNameWithoutExt.includes(normalizedTeamName) || normalizedTeamName.includes(fileNameWithoutExt)) {
+            // Found a match! Construct the direct image URL
+            matchedLogoUrl = `https://drive.google.com/uc?export=view&id=${file.id}`;
+            break;
+          }
+        }
+      }
+
+      // If no match found, use a fallback demo logo based on the team's initials
+      if (!matchedLogoUrl && teamName) {
+        matchedLogoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(teamName)}&background=random&color=fff&size=128&bold=true`;
+      }
+
+      rowData['LogoUrl'] = matchedLogoUrl;
       return rowData;
     });
 

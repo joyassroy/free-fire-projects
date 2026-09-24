@@ -79,6 +79,32 @@ export default function Dashboard4() {
     );
   };
 
+  const CustomRadarTick = (props: any) => {
+    const { payload, x, y, cx, cy, ...rest } = props;
+    // Calculate direction from center to the tick
+    const dx = x - cx;
+    const dy = y - cy;
+    const length = Math.sqrt(dx * dx + dy * dy);
+    
+    // Push the text further out by 35 pixels
+    const pushOut = 35;
+    const nx = x + (dx / length) * pushOut;
+    const ny = y + (dy / length) * pushOut;
+    
+    return (
+      <text
+        {...rest}
+        x={nx}
+        y={ny}
+        fill="#000000"
+        fontSize={18}
+        fontWeight="900"
+      >
+        {payload.value}
+      </text>
+    );
+  };
+
   return (
     <div className="w-full min-h-screen p-8 flex items-center justify-center bg-transparent overflow-hidden">
       
@@ -105,14 +131,14 @@ export default function Dashboard4() {
         {/* Center Radar Chart */}
         <div className="w-[600px] h-[600px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="60%" data={radarData}>
+            <RadarChart cx="50%" cy="50%" outerRadius="50%" data={radarData}>
               {/* PolarGrid styles the spider web lines */}
               <PolarGrid stroke="#ffffff30" />
               
-              {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners */}
+              {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners pushed further out */}
               <PolarAngleAxis 
                 dataKey="subject" 
-                tick={{ fill: '#000000', fontSize: 18, fontWeight: '900' }} 
+                tick={<CustomRadarTick />}
               />
               
               {/* Radar for Team 1 */}

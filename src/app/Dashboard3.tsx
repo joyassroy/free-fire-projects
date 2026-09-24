@@ -120,7 +120,7 @@ export default function Dashboard3() {
               axisLine={false}
               tickLine={false}
               tick={{fill: '#ffffff80', fontSize: 14, fontWeight: 'bold'}} 
-              label={{ value: 'POINTS', angle: -90, position: 'insideLeft', fill: '#ffffff80', fontWeight: 'bold', offset: -10 }}
+              label={{ value: 'KILL', angle: -90, position: 'insideLeft', fill: '#ffffff80', fontWeight: 'bold', offset: -10 }}
             />
             
             {/* Right Axis for Damage */}

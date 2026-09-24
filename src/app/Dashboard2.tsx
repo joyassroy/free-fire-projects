@@ -29,13 +29,13 @@ export default function Dashboard2() {
       return {
         name: row.TeamName.trim(), 
         logo: row.LogoUrl, 
-        total: parseInt(row.Total) || 0, // Green Bar
-        elims: parseInt(row.Kill) || 0, // Black Bar
+        elims: parseInt(row.Kill) || 0, // Green Bar (Left Y-Axis)
+        damage: parseInt(row.Damage) || 0, // Black Bar (Right Y-Axis)
       };
     });
 
-  // Sort by Total points (descending) 
-  chartData.sort((a: any, b: any) => b.total - a.total);
+  // Sort by Elims (descending) 
+  chartData.sort((a: any, b: any) => b.elims - a.elims);
 
   const CustomXAxisTick = ({ x, y, payload }: any) => {
     const teamData = chartData.find((d: any) => d.name === payload.value) || {};
@@ -56,7 +56,7 @@ export default function Dashboard2() {
             e.target.style.display = 'none';
           }}
         />
-        {/* We can hide the text to match the image which only shows logos inside the boxes */}
+        {/* Hiding the text to match the image which only shows logos inside the boxes */}
       </g>
     );
   };
@@ -67,8 +67,8 @@ export default function Dashboard2() {
     return (
       <text
         x={x + width / 2}
-        y={y + 15}
-        fill={fill === '#000000' ? '#ffffff' : '#000000'} // Contrast color
+        y={y + 20} // Adjusted to sit nicely inside/top of bar
+        fill={fill === '#000000' ? '#ffffff' : '#000000'} // Contrast color for readability
         textAnchor="middle"
         fontSize={14}
         fontWeight="bold"
@@ -95,9 +95,21 @@ export default function Dashboard2() {
             <CartesianGrid stroke="#e0e0e0" vertical={false} />
             
             <YAxis 
+              yAxisId="left"
+              orientation="left"
               axisLine={false}
               tickLine={false}
-              tick={{fill: '#666', fontSize: 14}}
+              tick={{fill: '#00ffa3', fontWeight: 'bold'}}
+              domain={[0, (dataMax: number) => Math.max(dataMax * 1.5, 30)]}
+            />
+
+            <YAxis 
+              yAxisId="right"
+              orientation="right"
+              axisLine={false}
+              tickLine={false}
+              tick={{fill: '#000', fontWeight: 'bold'}}
+              domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
             
             <XAxis 
@@ -114,20 +126,22 @@ export default function Dashboard2() {
             />
 
             {/* Red Reference Line at the bottom similar to the image */}
-            <ReferenceLine y={0} stroke="#ff0000" strokeWidth={6} />
+            <ReferenceLine y={0} yAxisId="left" stroke="#ff0000" strokeWidth={6} />
 
-            {/* Green Bar (e.g. Total Score) */}
+            {/* Green Bar (Kills) */}
             <Bar 
-              dataKey="total" 
-              name="Total Score"
+              yAxisId="left"
+              dataKey="elims" 
+              name="Kills"
               fill="#00ffa3" 
               label={<CustomBarLabel fill="#00ffa3" />}
             />
             
-            {/* Black Bar (e.g. Kills) */}
+            {/* Black Bar (Damage) */}
             <Bar 
-              dataKey="elims" 
-              name="Kills"
+              yAxisId="right"
+              dataKey="damage" 
+              name="Damage"
               fill="#000000" 
               label={<CustomBarLabel fill="#000000" />}
             />

@@ -73,8 +73,8 @@ export default function Dashboard4() {
     
     return (
       <g transform={`translate(${cx},${cy})`}>
-        <circle className="animate-ping" cx={0} cy={0} r={8} fill={fill} opacity={0.5} />
-        <circle className="animate-pulse" cx={0} cy={0} r={5} fill={fill} stroke="#111" strokeWidth={2} />
+        <circle className="animate-ping" cx={0} cy={0} r={6} fill={fill} opacity={0.6} />
+        <circle className="animate-pulse" cx={0} cy={0} r={4} fill={fill} stroke="#000" strokeWidth={1} />
       </g>
     );
   };
@@ -109,10 +109,10 @@ export default function Dashboard4() {
               {/* PolarGrid styles the spider web lines */}
               <PolarGrid stroke="#ffffff30" />
               
-              {/* The labels (KILL PTS, DAMAGE, etc.) */}
+              {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners */}
               <PolarAngleAxis 
                 dataKey="subject" 
-                tick={{ fill: '#ffffff80', fontSize: 16, fontWeight: 'bold' }} 
+                tick={{ fill: '#000000', fontSize: 18, fontWeight: '900' }} 
               />
               
               {/* Radar for Team 1 */}
@@ -122,7 +122,7 @@ export default function Dashboard4() {
                 stroke={team1.color}
                 fill={team1.color}
                 fillOpacity={0.6}
-                strokeWidth={3}
+                strokeWidth={1.5}
                 dot={<BlinkingDot fill={team1.color} />}
               />
               
@@ -133,7 +133,7 @@ export default function Dashboard4() {
                 stroke={team2.color}
                 fill={team2.color}
                 fillOpacity={0.6}
-                strokeWidth={3}
+                strokeWidth={1.5}
                 dot={<BlinkingDot fill={team2.color} />}
               />
             </RadarChart>

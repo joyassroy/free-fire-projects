@@ -92,21 +92,21 @@ export default function Dashboard5() {
 
   // Custom Dot component that draws the circle and the text badge
   const CustomDot = (props: any) => {
-    const { cx, cy, payload, dataKey, color, textColor, isTop } = props;
+    const { cx, cy, payload, color, textColor, isTop } = props;
     if (typeof cx !== 'number' || typeof cy !== 'number') return null;
 
     const label = payload.name;
-    const badgeWidth = 95; // Increased width to fit label + value
-    const badgeHeight = 22;
+    const badgeWidth = 84; // Increased width for better horizontal padding
+    const badgeHeight = 20; // Increased height for better vertical padding
     
     // Position badge so it sits right on top or right below the dot
-    const badgeY = isTop ? cy - badgeHeight - 6 : cy + 6;
+    const badgeY = isTop ? cy - badgeHeight - 5 : cy + 5;
     const badgeX = cx - badgeWidth / 2;
 
     return (
       <g>
         {/* Core Dot */}
-        <circle cx={cx} cy={cy} r={5} fill={color} stroke="#111" strokeWidth={1} />
+        <circle cx={cx} cy={cy} r={4} fill={color} stroke="#111" strokeWidth={1} />
         
         {/* Rectangular Badge */}
         <rect 
@@ -121,14 +121,14 @@ export default function Dashboard5() {
         {/* Text inside badge */}
         <text
           x={cx}
-          y={badgeY + 15}
+          y={badgeY + 14}
           textAnchor="middle"
           fill={textColor}
-          fontSize={11}
+          fontSize={10}
           fontWeight="900"
-          className="uppercase tracking-wider"
+          className="uppercase tracking-widest"
         >
-          {label}: {payload[`${dataKey}Value`]}
+          {label}
         </text>
       </g>
     );
@@ -139,9 +139,6 @@ export default function Dashboard5() {
       <div className="w-full max-w-4xl h-[700px] relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 80, right: 80, bottom: 80, left: 80 }}>
-            {/* Thin vertical lines only */}
-            <CartesianGrid stroke="#ffffff40" vertical={true} horizontal={false} />
-            
             {/* Hidden Axes */}
             <XAxis dataKey="name" hide={true} />
             <YAxis domain={[0, 100]} hide={true} />

@@ -67,6 +67,18 @@ export default function Dashboard4() {
     { subject: 'KNOCK DOWN', A: knockNorm.n1, B: knockNorm.n2 },
   ];
 
+  const BlinkingDot = (props: any) => {
+    const { cx, cy, fill } = props;
+    if (typeof cx !== 'number' || typeof cy !== 'number') return null;
+    
+    return (
+      <g transform={`translate(${cx},${cy})`}>
+        <circle className="animate-ping" cx={0} cy={0} r={8} fill={fill} opacity={0.5} />
+        <circle className="animate-pulse" cx={0} cy={0} r={5} fill={fill} stroke="#111" strokeWidth={2} />
+      </g>
+    );
+  };
+
   return (
     <div className="w-full min-h-screen p-8 flex items-center justify-center bg-transparent overflow-hidden">
       
@@ -111,6 +123,7 @@ export default function Dashboard4() {
                 fill={team1.color}
                 fillOpacity={0.6}
                 strokeWidth={3}
+                dot={<BlinkingDot fill={team1.color} />}
               />
               
               {/* Radar for Team 2 */}
@@ -121,6 +134,7 @@ export default function Dashboard4() {
                 fill={team2.color}
                 fillOpacity={0.6}
                 strokeWidth={3}
+                dot={<BlinkingDot fill={team2.color} />}
               />
             </RadarChart>
           </ResponsiveContainer>

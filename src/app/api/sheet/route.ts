@@ -37,8 +37,14 @@ export async function GET() {
 
     const headers = rows[0];
     
-    // Helper function to make matching easy (removes spaces, symbols, and converts to lowercase)
+    // Helper function to make matching easy
     const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+    // 3. Find the demo.png file to use as a fallback
+    const demoFile = driveFiles.find(file => file.name && normalize(file.name) === 'demopng');
+    const demoLogoUrl = demoFile 
+      ? `https://drive.google.com/thumbnail?id=${demoFile.id}&sz=w150` 
+      : null;
 
     const data = rows.slice(1).map((row) => {
       const rowData: Record<string, any> = {};
@@ -52,25 +58,22 @@ export async function GET() {
       const normalizedTeamName = normalize(teamName);
       let matchedLogoUrl = null;
 
-      // 3. Match team name with Drive file names
+      // 4. Match team name with Drive file names
       for (const file of driveFiles) {
         if (file.name) {
-          // Remove .png/.jpg extension and normalize
           const fileNameWithoutExt = normalize(file.name.replace(/\.[^/.]+$/, ""));
           
-          // If the sheet's team name is inside the file name or vice versa, it's a match!
-          // e.g. "X2" matches "X2 GLOBAL"
           if (fileNameWithoutExt.includes(normalizedTeamName) || normalizedTeamName.includes(fileNameWithoutExt)) {
-            // Found a match! Construct the direct image URL
-            matchedLogoUrl = `https://drive.google.com/uc?export=view&id=${file.id}`;
+            // Found a match! Use Google's fast thumbnail CDN instead of the slow 'uc' link
+            matchedLogoUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w150`;
             break;
           }
         }
       }
 
-      // If no match found, use a fallback demo logo based on the team's initials
+      // If no match found, use the demo.png from Drive. If demo.png is missing, use Avatar
       if (!matchedLogoUrl && teamName) {
-        matchedLogoUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(teamName)}&background=random&color=fff&size=128&bold=true`;
+        matchedLogoUrl = demoLogoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(teamName)}&background=random&color=fff&size=128&bold=true`;
       }
 
       rowData['LogoUrl'] = matchedLogoUrl;

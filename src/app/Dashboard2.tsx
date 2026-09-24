@@ -62,15 +62,21 @@ export default function Dashboard2() {
   };
 
   const CustomBarLabel = (props: any) => {
-    const { x, y, width, value, fill } = props;
-    if (value === 0) return null;
+    const { x, y, width, height, value, textColor } = props;
+    // Y is the top of the bar. height is the bar height.
+    // So y + height is the X-axis line.
+    // If value is 0, height is 0. 
+    // To ensure the text is always above the red line, we can just use the chart's bottom boundary,
+    // but y + height is the safest relative position.
+    const bottomY = y + height - 10; 
+    
     return (
       <text
         x={x + width / 2}
-        y={y + 20} // Adjusted to sit nicely inside/top of bar
-        fill={fill === '#000000' ? '#ffffff' : '#000000'} // Contrast color for readability
+        y={bottomY} 
+        fill={textColor} 
         textAnchor="middle"
-        fontSize={14}
+        fontSize={12}
         fontWeight="bold"
       >
         {value}
@@ -78,12 +84,25 @@ export default function Dashboard2() {
     );
   };
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div style={{ backgroundColor: '#111', padding: '12px', border: '1px solid #00ffa3', borderRadius: '8px' }}>
+          <p style={{ color: '#fff', fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.dataKey === 'damage' ? '#ffffff' : '#00ffa3', margin: '4px 0', fontSize: '14px' }}>
+              {entry.name} : {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div 
-      className="w-full min-h-screen p-8 flex flex-col items-center justify-center relative overflow-hidden bg-white" 
-      style={{
-        backgroundImage: 'radial-gradient(circle at 50% 50%, #f0f0f0 0%, #ffffff 100%)'
-      }}
+      className="w-full min-h-screen p-8 flex flex-col items-center justify-center relative overflow-hidden bg-transparent" 
     >
       <div className="w-full max-w-6xl h-[600px] z-10 relative">
         <ResponsiveContainer width="100%" height="100%">
@@ -122,11 +141,8 @@ export default function Dashboard2() {
             
             <Tooltip 
               cursor={{fill: '#f5f5f5'}}
-              contentStyle={{ backgroundColor: '#111', borderColor: '#00ffa3', color: '#fff', borderRadius: '4px' }}
+              content={<CustomTooltip />}
             />
-
-            {/* Red Reference Line at the bottom similar to the image */}
-            <ReferenceLine y={0} yAxisId="left" stroke="#ff0000" strokeWidth={6} />
 
             {/* Green Bar (Kills) */}
             <Bar 
@@ -134,7 +150,7 @@ export default function Dashboard2() {
               dataKey="elims" 
               name="Kills"
               fill="#00ffa3" 
-              label={<CustomBarLabel fill="#00ffa3" />}
+              label={<CustomBarLabel textColor="#000000" />}
             />
             
             {/* Black Bar (Damage) */}
@@ -143,7 +159,7 @@ export default function Dashboard2() {
               dataKey="damage" 
               name="Damage"
               fill="#000000" 
-              label={<CustomBarLabel fill="#000000" />}
+              label={<CustomBarLabel textColor="#00ffa3" />}
             />
           </BarChart>
         </ResponsiveContainer>

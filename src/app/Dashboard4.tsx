@@ -80,7 +80,7 @@ export default function Dashboard4() {
   };
 
   const CustomRadarTick = (props: any) => {
-    const { payload, x, y, cx, cy, ...rest } = props;
+    const { payload, x, y, cx, cy, textAnchor } = props;
     // Calculate direction from center to the tick
     const dx = x - cx;
     const dy = y - cy;
@@ -93,9 +93,9 @@ export default function Dashboard4() {
     
     return (
       <text
-        {...rest}
         x={nx}
         y={ny}
+        textAnchor={textAnchor || "middle"}
         fill="#000000"
         fontSize={18}
         fontWeight="900"
@@ -129,9 +129,9 @@ export default function Dashboard4() {
         </div>
 
         {/* Center Radar Chart */}
-        <div className="w-[600px] h-[600px]">
+        <div className="w-[700px] h-[600px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="50%" data={radarData}>
+            <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
               {/* PolarGrid styles the spider web lines */}
               <PolarGrid stroke="#ffffff30" />
               

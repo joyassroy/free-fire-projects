@@ -20,8 +20,8 @@
 }
 
 html, body {
-  background: transparent !important;
-  background-color: transparent !important;
+  background: rgba(0,0,0,0) !important;
+  background-color: rgba(0,0,0,0) !important;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }

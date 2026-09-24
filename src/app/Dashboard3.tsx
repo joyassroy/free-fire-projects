@@ -2,15 +2,14 @@
 
 import useSWR from 'swr';
 import {
-  ComposedChart,
-  Bar,
+  LineChart,
   Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Legend
 } from 'recharts';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -20,7 +19,7 @@ export default function Dashboard3() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-[#ff00a0]">Loading Live Stats...</div>;
+  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-[#00ffa3]">Loading Live Stats...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   const chartData = (data?.data || [])
@@ -29,114 +28,154 @@ export default function Dashboard3() {
       return {
         name: row.TeamName.trim(), 
         logo: row.LogoUrl, 
+        kills: parseInt(row.Kill) || 0, 
+        survival: parseInt(row['Survival Score']) || 0,
         damage: parseInt(row.Damage) || 0,
+        total: parseInt(row.Total) || 0,
       };
     });
 
-  // Sort by Damage (ascending: low to high)
-  chartData.sort((a: any, b: any) => a.damage - b.damage);
+  // Sort by Total Score to give a logical flow to the lines, or keep original order
+  // Let's sort by Total (descending) so the best teams are on the left
+  chartData.sort((a: any, b: any) => b.total - a.total);
 
-  const CustomLogoDot = (props: any) => {
-    const { cx, cy, payload } = props;
-    if (typeof cx !== 'number' || typeof cy !== 'number') return null;
-
+  const CustomXAxisTick = ({ x, y, payload }: any) => {
+    const teamData = chartData.find((d: any) => d.name === payload.value) || {};
+    
     return (
-      <g transform={`translate(${cx},${cy})`}>
-        {/* Neon Glow Circle */}
-        <circle 
-          cx={0} 
-          cy={0} 
-          r={26} 
-          fill="#1a1a2e" 
-          stroke="#ff00a0" 
-          strokeWidth={3} 
-          style={{ filter: 'drop-shadow(0 0 10px #ff00a0)' }} 
-        />
-        {/* Team Logo */}
+      <g transform={`translate(${x},${y})`}>
+        {/* Only Logo, No Text */}
         <image 
-          href={payload.logo} 
-          x={-18} 
-          y={-18} 
-          height="36" 
-          width="36" 
+          href={teamData.logo} 
+          x={-20} 
+          y={10} 
+          height="40" 
+          width="40" 
           onError={(e: any) => { e.target.style.display = 'none'; }}
         />
-        {/* Value Label above the Logo */}
-        <text 
-          x={0} 
-          y={-35} 
-          textAnchor="middle" 
-          fill="#ffffff" 
-          fontSize={16} 
-          fontWeight="bold" 
-          style={{ filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.8))' }}
-        >
-          {payload.damage}
-        </text>
       </g>
     );
   };
 
-  const CustomXAxisTick = ({ x, y, payload }: any) => {
-    return (
-      <g transform={`translate(${x},${y})`}>
-        {/* Intentionally left blank to hide team names on the axis */}
-      </g>
-    );
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="bg-[#111111ee] backdrop-blur-md p-4 border border-[#444] rounded-xl shadow-2xl">
+          <div className="flex items-center space-x-3 mb-3 border-b border-[#333] pb-2">
+            <img src={data.logo} alt="logo" className="w-8 h-8 rounded-full" />
+            <span className="text-white font-bold text-lg">{data.name}</span>
+          </div>
+          <p className="text-[#00ffa3] font-semibold flex justify-between">
+            <span>Kill Points:</span> <span className="ml-4">{data.kills}</span>
+          </p>
+          <p className="text-[#ffea00] font-semibold flex justify-between">
+            <span>Survival Score:</span> <span className="ml-4">{data.survival}</span>
+          </p>
+          <p className="text-[#ff00a0] font-semibold flex justify-between border-t border-[#333] mt-2 pt-2">
+            <span>Damage:</span> <span className="ml-4">{data.damage}</span>
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const renderLegendText = (value: string, entry: any) => {
+    const { color } = entry;
+    return <span style={{ color, fontWeight: 'bold', marginRight: '20px', fontSize: '16px' }}>{value}</span>;
   };
 
   return (
-    <div className="w-full min-h-screen p-8 flex flex-col items-center justify-center bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] overflow-hidden">
-      <div className="text-center mb-16 z-10">
-        <h1 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#ff00a0] via-[#00ffa3] to-[#ffea00] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] tracking-widest uppercase">
-          Damage Leaderboard
+    <div className="w-full min-h-screen p-8 flex flex-col items-center justify-center bg-transparent overflow-hidden">
+      <div className="text-center mb-10 z-10">
+        <h1 className="text-4xl font-black text-white tracking-wider uppercase mb-2">
+          Performance Overview
         </h1>
-        <p className="text-[#00ffa3] mt-3 text-xl font-medium tracking-wide">Top Damage Dealers</p>
+        <p className="text-gray-400 text-lg font-medium tracking-wide">Kill Points vs Survival Score vs Damage</p>
       </div>
       
-      <div className="w-full max-w-7xl h-[600px] z-10 relative bg-[#00000040] rounded-3xl border border-[#ffffff10] p-6 shadow-2xl backdrop-blur-sm">
+      <div className="w-full max-w-7xl h-[600px] z-10 relative">
         <ResponsiveContainer width="100%" height="100%">
-          <ComposedChart data={chartData} margin={{ top: 60, right: 20, bottom: 40, left: 20 }}>
-            <CartesianGrid stroke="#ffffff15" strokeDasharray="3 3" vertical={false} />
+          <LineChart data={chartData} margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
+            <CartesianGrid stroke="#ffffff15" vertical={false} />
+            
+            {/* Left Axis for Kills and Survival */}
+            <YAxis 
+              yAxisId="left" 
+              axisLine={false}
+              tickLine={false}
+              tick={{fill: '#ffffff80', fontSize: 14, fontWeight: 'bold'}} 
+              label={{ value: 'POINTS', angle: -90, position: 'insideLeft', fill: '#ffffff80', fontWeight: 'bold', offset: -10 }}
+            />
+            
+            {/* Right Axis for Damage */}
+            <YAxis 
+              yAxisId="right" 
+              orientation="right"
+              axisLine={false}
+              tickLine={false}
+              tick={{fill: '#ff00a0', fontSize: 14, fontWeight: 'bold'}} 
+              label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: '#ff00a0', fontWeight: 'bold', offset: -10 }}
+            />
             
             <XAxis 
               dataKey="name" 
               tick={<CustomXAxisTick />} 
               interval={0} 
-              axisLine={{ stroke: '#ff00a0', strokeWidth: 2 }}
+              axisLine={{ stroke: '#ffffff30', strokeWidth: 2 }}
               tickLine={false}
-            />
-            
-            <YAxis 
-              type="number" 
-              axisLine={false}
-              tickLine={false}
-              tick={{fill: '#ff00a0', fontSize: 14, fontWeight: 'bold'}} 
-              domain={[0, (dataMax: number) => dataMax * 1.2]}
             />
             
             <Tooltip 
-              cursor={{fill: '#ffffff10'}}
-              contentStyle={{ backgroundColor: '#111', borderColor: '#ff00a0', color: '#fff', borderRadius: '8px' }}
+              cursor={{ stroke: '#ffffff30', strokeWidth: 2, strokeDasharray: '5 5' }} 
+              content={<CustomTooltip />} 
             />
             
-            {/* The Neon Laser Beam (Thin Bar) */}
-            <Bar dataKey="damage" barSize={4} radius={[10, 10, 0, 0]}>
-              {chartData.map((entry: any, index: number) => (
-                <Cell key={`cell-${index}`} fill="#ff00a0" style={{ filter: 'drop-shadow(0 0 8px #ff00a0)' }} />
-              ))}
-            </Bar>
-
-            {/* The Floating Logo at the top of the beam */}
-            <Line 
-              type="monotone" 
-              dataKey="damage" 
-              stroke="none" 
-              isAnimationActive={false} // Prevents dot drifting
-              activeDot={false} 
-              dot={<CustomLogoDot />} 
+            <Legend 
+              verticalAlign="bottom" 
+              height={36} 
+              iconType="circle" 
+              formatter={renderLegendText}
+              wrapperStyle={{ paddingTop: '40px' }}
             />
-          </ComposedChart>
+
+            {/* Kill Points Line */}
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              name="Kill Points"
+              dataKey="kills" 
+              stroke="#00ffa3" 
+              strokeWidth={3} 
+              dot={{ r: 5, fill: '#00ffa3', stroke: '#111', strokeWidth: 2 }} 
+              activeDot={{ r: 8, fill: '#fff', stroke: '#00ffa3', strokeWidth: 2 }} 
+            />
+            
+            {/* Survival Score Line */}
+            <Line 
+              yAxisId="left"
+              type="monotone" 
+              name="Survival Score"
+              dataKey="survival" 
+              stroke="#ffea00" 
+              strokeWidth={3} 
+              dot={{ r: 5, fill: '#ffea00', stroke: '#111', strokeWidth: 2 }} 
+              activeDot={{ r: 8, fill: '#fff', stroke: '#ffea00', strokeWidth: 2 }} 
+            />
+            
+            {/* Damage Line (on Right Axis) */}
+            <Line 
+              yAxisId="right"
+              type="monotone" 
+              name="Damage"
+              dataKey="damage" 
+              stroke="#ff00a0" 
+              strokeWidth={3} 
+              dot={{ r: 5, fill: '#ff00a0', stroke: '#111', strokeWidth: 2 }} 
+              activeDot={{ r: 8, fill: '#fff', stroke: '#ff00a0', strokeWidth: 2 }} 
+            />
+          </LineChart>
         </ResponsiveContainer>
       </div>
     </div>

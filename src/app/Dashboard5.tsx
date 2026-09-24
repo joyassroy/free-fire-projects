@@ -27,6 +27,7 @@ export default function Dashboard5() {
     kills: parseInt(team1Row[2]) || 0,
     assists: parseInt(team1Row[3]) || 0,
     knockDown: parseInt(team1Row[4]) || 0,
+    damage: parseInt(team1Row[7]) || 0,
     headshots: parseInt(team1Row[30]) || 0,
     color: '#a855f7', // Purple
     textColor: '#ffffff'
@@ -36,32 +37,57 @@ export default function Dashboard5() {
     kills: parseInt(team2Row[2]) || 0,
     assists: parseInt(team2Row[3]) || 0,
     knockDown: parseInt(team2Row[4]) || 0,
+    damage: parseInt(team2Row[7]) || 0,
     headshots: parseInt(team2Row[30]) || 0,
     color: '#eab308', // Yellow
     textColor: '#000000'
   };
 
-  // Normalize data for the slope chart visual (values mapped to [20, 80] range)
-  const getNormalized = (val1: number, val2: number) => {
-    if (val1 === val2) return { t1: 50, t2: 50 };
-    const max = Math.max(val1, val2);
-    if (max === 0) return { t1: 20, t2: 20 };
-    return { 
-      t1: 20 + (val1 / max) * 60, 
-      t2: 20 + (val2 / max) * 60 
-    };
+  // Map values to a specific vertical band to enforce the 'V' shape
+  // Kills: mapped to [40, 80]
+  // Headshots: mapped to [10, 50] (creates the dip)
+  // Assists: mapped to [35, 75] (goes back up)
+  // Damage: mapped to [60, 90] (highest)
+  
+  const scaleValue = (val: number, max: number, minBound: number, maxBound: number) => {
+    if (max === 0) return minBound;
+    return minBound + (val / max) * (maxBound - minBound);
   };
 
-  const killsNorm = getNormalized(team1.kills, team2.kills);
-  const headshotsNorm = getNormalized(team1.headshots, team2.headshots);
-  const assistsNorm = getNormalized(team1.assists, team2.assists);
-  const knockNorm = getNormalized(team1.knockDown, team2.knockDown);
+  const maxKills = Math.max(team1.kills, team2.kills) || 1;
+  const maxHeadshots = Math.max(team1.headshots, team2.headshots) || 1;
+  const maxAssists = Math.max(team1.assists, team2.assists) || 1;
+  const maxDamage = Math.max(team1.damage, team2.damage) || 1;
 
   const chartData = [
-    { name: 'KILLS', team1: killsNorm.t1, team2: killsNorm.t2 },
-    { name: 'HEADSHOTS', team1: headshotsNorm.t1, team2: headshotsNorm.t2 },
-    { name: 'ASSISTS', team1: assistsNorm.t1, team2: assistsNorm.t2 },
-    { name: 'KNOCKDOWN', team1: knockNorm.t1, team2: knockNorm.t2 },
+    { 
+      name: 'KILLS', 
+      team1: scaleValue(team1.kills, maxKills, 40, 80), 
+      team2: scaleValue(team2.kills, maxKills, 40, 80), 
+      team1Value: team1.kills, 
+      team2Value: team2.kills 
+    },
+    { 
+      name: 'HEADSHOTS', 
+      team1: scaleValue(team1.headshots, maxHeadshots, 10, 50), 
+      team2: scaleValue(team2.headshots, maxHeadshots, 10, 50), 
+      team1Value: team1.headshots, 
+      team2Value: team2.headshots 
+    },
+    { 
+      name: 'ASSISTS', 
+      team1: scaleValue(team1.assists, maxAssists, 35, 75), 
+      team2: scaleValue(team2.assists, maxAssists, 35, 75), 
+      team1Value: team1.assists, 
+      team2Value: team2.assists 
+    },
+    { 
+      name: 'DAMAGE', 
+      team1: scaleValue(team1.damage, maxDamage, 60, 90), 
+      team2: scaleValue(team2.damage, maxDamage, 60, 90), 
+      team1Value: team1.damage, 
+      team2Value: team2.damage 
+    },
   ];
 
   // Custom Dot component that draws the circle and the text badge
@@ -70,8 +96,8 @@ export default function Dashboard5() {
     if (typeof cx !== 'number' || typeof cy !== 'number') return null;
 
     const label = payload.name;
-    const badgeWidth = 100;
-    const badgeHeight = 28;
+    const badgeWidth = 95; // Increased width to fit label + value
+    const badgeHeight = 22;
     
     // Position badge so it sits right on top or right below the dot
     const badgeY = isTop ? cy - badgeHeight - 6 : cy + 6;
@@ -80,7 +106,7 @@ export default function Dashboard5() {
     return (
       <g>
         {/* Core Dot */}
-        <circle cx={cx} cy={cy} r={6} fill={color} stroke="#111" strokeWidth={1} />
+        <circle cx={cx} cy={cy} r={5} fill={color} stroke="#111" strokeWidth={1} />
         
         {/* Rectangular Badge */}
         <rect 
@@ -95,14 +121,14 @@ export default function Dashboard5() {
         {/* Text inside badge */}
         <text
           x={cx}
-          y={badgeY + 19}
+          y={badgeY + 15}
           textAnchor="middle"
           fill={textColor}
-          fontSize={14}
+          fontSize={11}
           fontWeight="900"
-          className="uppercase tracking-widest"
+          className="uppercase tracking-wider"
         >
-          {label}
+          {label}: {payload[`${dataKey}Value`]}
         </text>
       </g>
     );

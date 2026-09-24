@@ -78,17 +78,9 @@ export default function Dashboard3() {
   };
 
   const CustomXAxisTick = ({ x, y, payload }: any) => {
-    // Break long names into two lines
-    const words = payload.value ? payload.value.split(' ') : [];
-    const line1 = words[0] || '';
-    const line2 = words.slice(1).join(' ') || '';
-
     return (
       <g transform={`translate(${x},${y})`}>
-        <text x={0} y={15} textAnchor="middle" fill="#ffffff" fontSize={11} fontWeight="bold">
-          <tspan x="0" dy="0">{line1}</tspan>
-          {line2 && <tspan x="0" dy="14">{line2}</tspan>}
-        </text>
+        {/* Intentionally left blank to hide team names on the axis */}
       </g>
     );
   };

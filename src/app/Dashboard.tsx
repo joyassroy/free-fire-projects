@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Rectangle,
 } from 'recharts';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -57,28 +58,34 @@ export default function Dashboard() {
             e.target.style.display = 'none';
           }}
         />
-        <text
-          x={0}
-          y={65}
-          textAnchor="middle"
-          fill="#ffffff"
-          fontSize={10} // Reduced font size slightly
-          fontWeight="bold"
-        >
-          <tspan x="0" dy="0">{line1}</tspan>
-          {line2 && <tspan x="0" dy="12">{line2}</tspan>}
-        </text>
       </g>
     );
   };
 
+  const CustomBar = (props: any) => {
+    const { x, y, width, height, payload } = props;
+    const value = payload.elims;
+    if (value === 0) return null; // No box for 0 kills
+
+    const finalHeight = Math.max(height, 30);
+    const bottom = y + height;
+    const finalY = bottom - finalHeight;
+
+    return <Rectangle x={x} y={finalY} width={width} height={finalHeight} fill="#ffffff" radius={[4, 4, 0, 0]} />;
+  };
+
   const CustomBarLabel = (props: any) => {
-    const { x, y, width, value } = props;
+    const { x, y, width, height, value } = props;
     if (value === 0) return null; // Don't show 0
+    
+    const finalHeight = Math.max(height, 30);
+    const bottom = y + height;
+    const finalY = bottom - finalHeight;
+
     return (
       <text
         x={x + width / 2}
-        y={y + 20}
+        y={finalY + 20}
         fill="#000"
         textAnchor="middle"
         fontSize={16}
@@ -157,8 +164,7 @@ export default function Dashboard() {
               yAxisId="left" 
               dataKey="elims" 
               barSize={40} 
-              fill="#ffffff" 
-              radius={[4, 4, 0, 0]}
+              shape={<CustomBar />}
               label={<CustomBarLabel />}
             />
             

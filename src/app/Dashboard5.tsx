@@ -23,7 +23,15 @@ export default function Dashboard5() {
   const team1Row = data.data[0];
   const team2Row = data.data[1];
 
+  const extractTeamName = (path: string) => {
+    if (!path) return 'TEAM';
+    const parts = path.split('\\');
+    const filename = parts[parts.length - 1];
+    return filename ? filename.replace('.png', '').toUpperCase() : 'TEAM';
+  };
+
   const team1 = {
+    name: extractTeamName(team1Row[0]),
     kills: parseInt(team1Row[2]) || 0,
     assists: parseInt(team1Row[3]) || 0,
     knockDown: parseInt(team1Row[4]) || 0,
@@ -34,6 +42,7 @@ export default function Dashboard5() {
   };
 
   const team2 = {
+    name: extractTeamName(team2Row[0]),
     kills: parseInt(team2Row[2]) || 0,
     assists: parseInt(team2Row[3]) || 0,
     knockDown: parseInt(team2Row[4]) || 0,
@@ -138,8 +147,19 @@ export default function Dashboard5() {
   };
 
   return (
-    <div className="w-full min-h-screen p-8 flex items-center justify-center bg-transparent overflow-hidden">
-      <div className="w-full max-w-4xl h-[700px] relative z-10">
+    <div className="w-full min-h-screen p-8 flex flex-col items-center justify-center bg-transparent overflow-hidden">
+      
+      {/* Top Header for Teams */}
+      <div className="w-full max-w-4xl flex items-center mb-8 z-20">
+        <div className="h-3 flex-grow rounded-l" style={{ backgroundColor: team1.color }}></div>
+        <div className="px-6 flex items-center space-x-6 text-white text-3xl font-black tracking-wider">
+          <span>{team1.name}</span>
+          <span>{team2.name}</span>
+        </div>
+        <div className="h-3 flex-grow rounded-r" style={{ backgroundColor: team2.color }}></div>
+      </div>
+
+      <div className="w-full max-w-4xl h-[650px] relative z-10">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData} margin={{ top: 80, right: 80, bottom: 80, left: 80 }}>
             {/* Hidden Axes */}

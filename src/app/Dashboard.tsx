@@ -60,7 +60,7 @@ export default function Dashboard() {
     });
 
   // Sort by Elims (descending) so highest is on the left
-  chartData.sort((a, b) => b.elims - a.elims);
+  chartData.sort((a: any, b: any) => b.elims - a.elims);
 
   const CustomXAxisTick = ({ x, y, payload }: any) => {
     // We get the original short name from the payload object we passed

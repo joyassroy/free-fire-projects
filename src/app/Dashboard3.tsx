@@ -86,6 +86,20 @@ export default function Dashboard3() {
     return <span style={{ color, fontWeight: 'bold', marginRight: '20px', fontSize: '16px' }}>{value}</span>;
   };
 
+  const BlinkingDot = (props: any) => {
+    const { cx, cy, fill } = props;
+    if (typeof cx !== 'number' || typeof cy !== 'number') return null;
+    
+    return (
+      <g transform={`translate(${cx},${cy})`}>
+        {/* Radar ping animation circle */}
+        <circle className="animate-ping" cx={0} cy={0} r={8} fill={fill} opacity={0.5} />
+        {/* Solid pulsing core dot */}
+        <circle className="animate-pulse" cx={0} cy={0} r={5} fill={fill} stroke="#111" strokeWidth={2} />
+      </g>
+    );
+  };
+
   return (
     <div className="w-full min-h-screen p-8 flex flex-col items-center justify-center bg-transparent overflow-hidden">
       <div className="text-center mb-10 z-10">
@@ -140,7 +154,7 @@ export default function Dashboard3() {
               wrapperStyle={{ paddingTop: '40px' }}
             />
 
-            {/* Kill Points Line */}
+            {/* Kill Points Line (Green with Blinking Dots) */}
             <Line 
               yAxisId="left"
               type="monotone" 
@@ -148,7 +162,7 @@ export default function Dashboard3() {
               dataKey="kills" 
               stroke="#00ffa3" 
               strokeWidth={3} 
-              dot={{ r: 5, fill: '#00ffa3', stroke: '#111', strokeWidth: 2 }} 
+              dot={<BlinkingDot fill="#00ffa3" />} 
               activeDot={{ r: 8, fill: '#fff', stroke: '#00ffa3', strokeWidth: 2 }} 
             />
             

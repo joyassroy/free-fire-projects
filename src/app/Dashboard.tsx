@@ -115,10 +115,7 @@ export default function Dashboard() {
 
   return (
     <div 
-      className="w-full min-h-screen p-8 flex flex-col items-center justify-center relative overflow-hidden" 
-      style={{ 
-        background: 'linear-gradient(135deg, #18092a 0%, #2a114f 50%, #18092a 100%)' 
-      }}
+      className="w-full min-h-screen p-8 flex flex-col items-center justify-center relative overflow-hidden bg-transparent" 
     >
       <div className="w-full max-w-6xl h-[600px] z-10 relative">
         <ResponsiveContainer width="100%" height="100%">

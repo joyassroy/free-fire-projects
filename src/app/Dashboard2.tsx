@@ -68,7 +68,7 @@ export default function Dashboard2() {
     // If value is 0, height is 0. 
     // To ensure the text is always above the red line, we can just use the chart's bottom boundary,
     // but y + height is the safest relative position.
-    const bottomY = y + height - 10; 
+    const bottomY = y + height - 5; 
     
     return (
       <text
@@ -119,6 +119,7 @@ export default function Dashboard2() {
               axisLine={false}
               tickLine={false}
               tick={{fill: '#00ffa3', fontWeight: 'bold'}}
+              tickFormatter={(value) => Math.round(value)}
               domain={[0, (dataMax: number) => Math.max(dataMax * 1.5, 30)]}
             />
 
@@ -128,6 +129,7 @@ export default function Dashboard2() {
               axisLine={false}
               tickLine={false}
               tick={{fill: '#000', fontWeight: 'bold'}}
+              tickFormatter={(value) => Math.round(value)}
               domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
             

@@ -103,10 +103,9 @@ export default function Dashboard() {
       <text
         x={x}
         y={y - 15}
-        fill="#ffc600"
+        fill="#000000"
         textAnchor="middle"
-        fontSize={14}
-        fontWeight="bold"
+        fontSize={12}
       >
         {value}
       </text>
@@ -139,6 +138,7 @@ export default function Dashboard() {
               orientation="right" 
               label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: '#ffc600', fontWeight: 'bold', offset: -10 }} 
               tick={{fill: '#ffc600', fontSize: 14}}
+              tickFormatter={(value) => Math.round(value)}
               axisLine={false}
               tickLine={false}
               domain={[0, (dataMax: number) => dataMax * 1.1]}

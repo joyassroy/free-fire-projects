@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Match F/D Graph Overlay</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  /* ============================================================
+     SETTINGS
+     ============================================================ */
+  :root{
+    --accent: #3EEBB0;   /* Finishes bar color */
+    --dark:   #111111;   /* Damage bar color */
+  }
+</style>
+<style>
+  html,body{
+    margin:0; padding:0; background:transparent;
+    font-family:"Arial Narrow", Arial, sans-serif;
+    overflow:hidden;
+  }
+  #wrap{
+    width:1780px; height:520px; position:relative;
+    padding:20px 40px 0 40px; box-sizing:border-box;
+  }
+  #chartCanvas{ width:100% !important; height:386px !important; display:block; }
+
+  #rows{
+    display:flex; justify-content:space-between; margin-top:0;
+  }
+  .col{
+    display:flex; flex-direction:column; align-items:center;
+    flex:1; min-width:0; padding:0 3px; box-sizing:border-box;
+  }
+  .logo-box{
+    width:88%; height:96px;
+    border-radius:10px;
+    background:var(--accent); display:flex; align-items:center; justify-content:center;
+    overflow:hidden; border:2px solid #0c3; box-sizing:border-box;
+  }
+  .logo-box img{ max-width:88%; max-height:88%; width:auto; height:auto; object-fit:contain; }
+  .team-fallback{ font-size:10px; font-weight:700; text-align:center; color:#062; padding:2px; }
+</style>
+</head>
+<body>
+
+<div id="wrap">
+  <canvas id="chartCanvas"></canvas>
+  <div id="rows"></div>
+</div>
+
+<script>
+/* ============================================================
+   1) Paste your Google Sheet "Publish to web" CSV link here
+      (File > Share > Publish to web > Link > CSV > Publish)
+   ============================================================ */
+const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSEvqELRt0HSdHmwSK4VJXm4OnbPr2uyuXAJ88RuO5AP9xz6pVrOKUpHg1dGiEuUpcO1zfzaCLis9x0/pub?output=csv";
+
+/* ============================================================
+   2) Local logo server address
+      Run a local server from your "Team Logo" folder, e.g.:
+        cd "C:\Team Logo"
+        npx http-server -p 8080
+      Then NAME.png files will be served from here:
+   ============================================================ */
+const LOGO_SERVER_BASE = "http://localhost:8080/";
+
+/* How often (in seconds) to refresh from the sheet */
+const REFRESH_SECONDS = 5;
+
+Chart.register(ChartDataLabels);
+
+let chart = null;
+let lastDataSignature = "";
+
+function extractFileName(windowsPath){
+  if(!windowsPath) return "";
+  const parts = windowsPath.split(/[\\/]/);
+  return parts[parts.length - 1].trim();
+}
+
+function findCol(headers, ...candidates){
+  const lower = headers.map(h => h.trim().toLowerCase());
+  for(const c of candidates){
+    const idx = lower.indexOf(c.toLowerCase());
+    if(idx !== -1) return idx;
+  }
+  return -1;
+}
+
+function loadData(){
+  Papa.parse(SHEET_CSV_URL, {
+    download: true,
+    header: false,
+    complete: function(results){
+      const rows = results.data;
+      // The first couple of rows are titles/headers — find the row that
+      // actually contains "TeamName" as a column header
+      let headerRowIndex = rows.findIndex(r =>
+        r.some(cell => (cell||"").toString().toLowerCase().includes("teamname"))
+      );
+      if(headerRowIndex === -1) headerRowIndex = 1;
+
+      const headers = rows[headerRowIndex];
+      const allAfter = rows.slice(headerRowIndex + 1);
+
+      // The sheet has multiple sections (BOOYAH STATS, MVP, GROUP STAGE, etc.)
+      // Only read rows up to the first fully-blank row, i.e. just the
+      // MAP STANDING section, so other sections don't get mixed in
+      let sectionEnd = allAfter.findIndex(r => r.every(cell => (cell || "").toString().trim() === ""));
+      if (sectionEnd === -1) sectionEnd = allAfter.length;
+      const dataRows = allAfter.slice(0, sectionEnd);
+
+      const logoIdx = findCol(headers, "logo");
+      const nameIdx = findCol(headers, "teamname", "team name", "team");
+      const killIdx = findCol(headers, "kill");
+      const dmgIdx  = findCol(headers, "damage");
+
+      let teams = dataRows
+        .filter(r => r[nameIdx] && r[nameIdx].toString().trim() !== "")
+        .map(r => ({
+          name: r[nameIdx].toString().trim(),
+          finishes: parseInt(r[killIdx]) || 0,
+          damage: parseInt(r[dmgIdx]) || 0,
+          logoFile: extractFileName(r[logoIdx])
+        }));
+
+      // Sort by Finishes descending, tie-break by Damage descending
+      // (matches the original reference graph's ordering)
+      teams.sort((a,b) => (b.finishes - a.finishes) || (b.damage - a.damage));
+
+      // Skip re-rendering if nothing actually changed in the sheet —
+      // this stops the bars from visibly "reloading" every refresh cycle
+      const signature = JSON.stringify(teams);
+      if(signature === lastDataSignature) return;
+      lastDataSignature = signature;
+
+      renderChart(teams);
+      renderLogos(teams);
+    },
+    error: function(err){
+      console.error("Sheet load failed:", err);
+    }
+  });
+}
+
+function renderChart(teams){
+  const ctx = document.getElementById('chartCanvas').getContext('2d');
+  const labels = teams.map(t => t.name);
+  const finishes = teams.map(t => t.finishes);
+  const damage = teams.map(t => t.damage);
+
+  const dataCfg = {
+    labels,
+    datasets: [
+      {
+        label:'Finishes',
+        data: finishes,
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
+        yAxisID: 'yFinishes',
+        // Number drawn directly on the bar itself, near its base —
+        // no separate HTML box, so it always lines up exactly with the bar
+        datalabels: {
+          anchor: 'start', align: 'end', offset: 4,
+          color: '#0a4d33', font: { weight: 800, size: 15 }
+        }
+      },
+      {
+        label:'Damage',
+        data: damage,
+        backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--dark').trim(),
+        yAxisID: 'yDamage',
+        datalabels: {
+          anchor: 'start', align: 'end', offset: 4,
+          color: '#f2f2f2', font: { weight: 800, size: 15 }
+        }
+      }
+    ]
+  };
+
+  if(chart){
+    chart.data.labels = labels;
+    chart.data.datasets[0].data = finishes;
+    chart.data.datasets[1].data = damage;
+    chart.update('none'); // update without animation — bars won't re-animate from zero
+    return;
+  }
+
+  chart = new Chart(ctx, {
+    type: 'bar',
+    data: dataCfg,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 400 },
+      layout: { padding: { top:0, bottom:0, left:0, right:0 } },
+      plugins: { legend: { display:false } },
+      scales: {
+        x: { display:false },
+        // Two independent y-axes: Finishes and Damage are on wildly
+        // different scales, so plotting them on one shared axis makes
+        // the Finishes bars nearly invisible. Separate axes let each
+        // dataset scale to its own max and reach full visible height.
+        yFinishes: { display:false, beginAtZero:true },
+        yDamage:   { display:false, beginAtZero:true }
+      }
+    }
+  });
+}
+
+function renderLogos(teams){
+  const rowsDiv = document.getElementById('rows');
+  rowsDiv.innerHTML = "";
+  teams.forEach(t => {
+    const col = document.createElement('div');
+    col.className = 'col';
+
+    const box = document.createElement('div');
+    box.className = 'logo-box';
+    if(t.logoFile){
+      const img = document.createElement('img');
+      img.src = LOGO_SERVER_BASE + encodeURIComponent(t.logoFile);
+      img.onerror = () => { box.innerHTML = `<div class="team-fallback">${t.name}</div>`; };
+      box.appendChild(img);
+    } else {
+      box.innerHTML = `<div class="team-fallback">${t.name}</div>`;
+    }
+    col.appendChild(box);
+
+    rowsDiv.appendChild(col);
+  });
+}
+
+loadData();
+setInterval(loadData, REFRESH_SECONDS * 1000);
+</script>
+
+</body>
+</html>

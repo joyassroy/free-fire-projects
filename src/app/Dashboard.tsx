@@ -15,6 +15,13 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const COLORS = {
+  barFill: '#ffffff',
+  lineStroke: '#ffc600',
+  lineLabel: '#000000',
+  barLabel: '#000000'
+};
+
 export default function Dashboard() {
   const { data, error, isLoading } = useSWR('/api/sheet', fetcher, {
     refreshInterval: 5000,
@@ -71,7 +78,7 @@ export default function Dashboard() {
     const bottom = y + height;
     const finalY = bottom - finalHeight;
 
-    return <Rectangle x={x} y={finalY} width={width} height={finalHeight} fill="#ffffff" radius={[4, 4, 0, 0]} />;
+    return <Rectangle x={x} y={finalY} width={width} height={finalHeight} fill={COLORS.barFill} radius={[4, 4, 0, 0]} />;
   };
 
   const CustomBarLabel = (props: any) => {
@@ -86,7 +93,7 @@ export default function Dashboard() {
       <text
         x={x + width / 2}
         y={finalY + 20}
-        fill="#000"
+        fill={COLORS.barLabel}
         textAnchor="middle"
         fontSize={16}
         fontWeight="bold"
@@ -103,7 +110,7 @@ export default function Dashboard() {
       <text
         x={x}
         y={y - 15}
-        fill="#000000"
+        fill={COLORS.lineLabel}
         textAnchor="middle"
         fontSize={12}
       >
@@ -137,8 +144,8 @@ export default function Dashboard() {
             <YAxis 
               yAxisId="right" 
               orientation="right" 
-              label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: '#ffc600', fontWeight: 'bold', offset: -10 }} 
-              tick={{fill: '#ffc600', fontSize: 14}}
+              label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: COLORS.lineStroke, fontWeight: 'bold', offset: -10 }} 
+              tick={{fill: COLORS.lineStroke, fontSize: 14}}
               tickFormatter={(value) => String(Math.round(value))}
               axisLine={false}
               tickLine={false}
@@ -170,10 +177,10 @@ export default function Dashboard() {
               yAxisId="right" 
               type="monotone" 
               dataKey="damage" 
-              stroke="#ffc600" 
+              stroke={COLORS.lineStroke} 
               strokeWidth={3} 
-              dot={{ r: 5, fill: '#ffc600', stroke: '#000', strokeWidth: 2 }}
-              activeDot={{ r: 8, fill: '#fff', stroke: '#ffc600' }}
+              dot={{ r: 5, fill: COLORS.lineStroke, stroke: '#000', strokeWidth: 2 }}
+              activeDot={{ r: 8, fill: '#fff', stroke: COLORS.lineStroke }}
               label={<CustomLineLabel />}
             />
           </ComposedChart>

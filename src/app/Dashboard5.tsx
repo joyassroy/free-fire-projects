@@ -12,6 +12,12 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const COLORS = {
+  team1: '#a855f7', // Purple
+  team2: '#eab308', // Yellow
+  lineStroke: '#6b7280', // Gray line connecting the dots
+};
+
 export default function Dashboard5() {
   const { data, error, isLoading } = useSWR('/api/sheet5', fetcher, {
     refreshInterval: 5000,
@@ -37,7 +43,7 @@ export default function Dashboard5() {
     knockDown: parseInt(team1Row[4]) || 0,
     damage: parseInt(team1Row[7]) || 0,
     headshots: parseInt(team1Row[30]) || 0,
-    color: '#a855f7', // Purple
+    color: COLORS.team1,
     textColor: '#ffffff'
   };
 
@@ -48,7 +54,7 @@ export default function Dashboard5() {
     knockDown: parseInt(team2Row[4]) || 0,
     damage: parseInt(team2Row[7]) || 0,
     headshots: parseInt(team2Row[30]) || 0,
-    color: '#eab308', // Yellow
+    color: COLORS.team2,
     textColor: '#000000'
   };
 
@@ -170,7 +176,7 @@ export default function Dashboard5() {
             <Line 
               type="linear" 
               dataKey="team1" 
-              stroke="#6b7280" 
+              stroke={COLORS.lineStroke} 
               strokeWidth={3} 
               dot={(props) => (
                 <CustomDot 
@@ -186,7 +192,7 @@ export default function Dashboard5() {
             <Line 
               type="linear" 
               dataKey="team2" 
-              stroke="#6b7280" 
+              stroke={COLORS.lineStroke} 
               strokeWidth={3} 
               dot={(props) => (
                 <CustomDot 

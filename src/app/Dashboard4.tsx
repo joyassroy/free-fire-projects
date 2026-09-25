@@ -11,6 +11,13 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const COLORS = {
+  team1: '#f59e0b', // Orange/Yellow
+  team2: '#3b82f6', // Blue
+  radarTick: '#000000',
+  radarGrid: '#ffffff30',
+};
+
 export default function Dashboard4() {
   const { data, error, isLoading } = useSWR('/api/sheet4', fetcher, {
     refreshInterval: 5000,
@@ -36,7 +43,7 @@ export default function Dashboard4() {
     assist: parseInt(team1Row[3]) || 0,
     knockDown: parseInt(team1Row[4]) || 0,
     damage: parseInt(team1Row[7]) || 0,
-    color: '#f59e0b', // Orange/Yellow
+    color: COLORS.team1,
   };
 
   const team2 = {
@@ -45,7 +52,7 @@ export default function Dashboard4() {
     assist: parseInt(team2Row[3]) || 0,
     knockDown: parseInt(team2Row[4]) || 0,
     damage: parseInt(team2Row[7]) || 0,
-    color: '#3b82f6', // Blue
+    color: COLORS.team2,
   };
 
   // Normalize data for Radar Chart (0 to 100)
@@ -96,7 +103,7 @@ export default function Dashboard4() {
         x={nx}
         y={ny}
         textAnchor={textAnchor || "middle"}
-        fill="#000000"
+        fill={COLORS.radarTick}
         fontSize={18}
         fontWeight="900"
       >
@@ -133,7 +140,7 @@ export default function Dashboard4() {
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
               {/* PolarGrid styles the spider web lines */}
-              <PolarGrid stroke="#ffffff30" />
+              <PolarGrid stroke={COLORS.radarGrid} />
               
               {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners pushed further out */}
               <PolarAngleAxis 

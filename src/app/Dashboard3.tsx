@@ -14,12 +14,20 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const COLORS = {
+  killPoints: '#00ffa3', // Green
+  survivalScore: '#ffea00', // Yellow
+  damage: '#ff00a0', // Pink
+  axisTextLeft: '#ffffff80',
+  axisTextRight: '#ff00a0',
+};
+
 export default function Dashboard3() {
   const { data, error, isLoading } = useSWR('/api/sheet', fetcher, {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-[#00ffa3]">Loading Live Stats...</div>;
+  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold" style={{ color: COLORS.killPoints }}>Loading Live Stats...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   const chartData = (data?.data || [])
@@ -66,13 +74,13 @@ export default function Dashboard3() {
             <img src={data.logo} alt="logo" className="w-8 h-8 rounded-full" />
             <span className="text-white font-bold text-lg">{data.name}</span>
           </div>
-          <p className="text-[#00ffa3] font-semibold flex justify-between">
+          <p className="font-semibold flex justify-between" style={{ color: COLORS.killPoints }}>
             <span>Kill Points:</span> <span className="ml-4">{data.kills}</span>
           </p>
-          <p className="text-[#ffea00] font-semibold flex justify-between">
+          <p className="font-semibold flex justify-between" style={{ color: COLORS.survivalScore }}>
             <span>Survival Score:</span> <span className="ml-4">{data.survival}</span>
           </p>
-          <p className="text-[#ff00a0] font-semibold flex justify-between border-t border-[#333] mt-2 pt-2">
+          <p className="font-semibold flex justify-between border-t border-[#333] mt-2 pt-2" style={{ color: COLORS.damage }}>
             <span>Damage:</span> <span className="ml-4">{data.damage}</span>
           </p>
         </div>
@@ -119,8 +127,8 @@ export default function Dashboard3() {
               yAxisId="left" 
               axisLine={false}
               tickLine={false}
-              tick={{fill: '#ffffff80', fontSize: 14, fontWeight: 'bold'}} 
-              label={{ value: 'KILL', angle: -90, position: 'insideLeft', fill: '#ffffff80', fontWeight: 'bold', offset: -10 }}
+              tick={{fill: COLORS.axisTextLeft, fontSize: 14, fontWeight: 'bold'}} 
+              label={{ value: 'KILL', angle: -90, position: 'insideLeft', fill: COLORS.axisTextLeft, fontWeight: 'bold', offset: -10 }}
             />
             
             {/* Right Axis for Damage */}
@@ -129,8 +137,8 @@ export default function Dashboard3() {
               orientation="right"
               axisLine={false}
               tickLine={false}
-              tick={{fill: '#ff00a0', fontSize: 14, fontWeight: 'bold'}} 
-              label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: '#ff00a0', fontWeight: 'bold', offset: -10 }}
+              tick={{fill: COLORS.axisTextRight, fontSize: 14, fontWeight: 'bold'}} 
+              label={{ value: 'DAMAGE', angle: 90, position: 'insideRight', fill: COLORS.axisTextRight, fontWeight: 'bold', offset: -10 }}
             />
             
             <XAxis 
@@ -160,10 +168,10 @@ export default function Dashboard3() {
               type="monotone" 
               name="Kill Points"
               dataKey="kills" 
-              stroke="#00ffa3" 
+              stroke={COLORS.killPoints} 
               strokeWidth={3} 
-              dot={<BlinkingDot fill="#00ffa3" />} 
-              activeDot={{ r: 8, fill: '#fff', stroke: '#00ffa3', strokeWidth: 2 }} 
+              dot={<BlinkingDot fill={COLORS.killPoints} />} 
+              activeDot={{ r: 8, fill: '#fff', stroke: COLORS.killPoints, strokeWidth: 2 }} 
             />
             
             {/* Survival Score Line */}
@@ -172,10 +180,10 @@ export default function Dashboard3() {
               type="monotone" 
               name="Survival Score"
               dataKey="survival" 
-              stroke="#ffea00" 
+              stroke={COLORS.survivalScore} 
               strokeWidth={3} 
-              dot={{ r: 5, fill: '#ffea00', stroke: '#111', strokeWidth: 2 }} 
-              activeDot={{ r: 8, fill: '#fff', stroke: '#ffea00', strokeWidth: 2 }} 
+              dot={{ r: 5, fill: COLORS.survivalScore, stroke: '#111', strokeWidth: 2 }} 
+              activeDot={{ r: 8, fill: '#fff', stroke: COLORS.survivalScore, strokeWidth: 2 }} 
             />
             
             {/* Damage Line (on Right Axis) */}
@@ -184,10 +192,10 @@ export default function Dashboard3() {
               type="monotone" 
               name="Damage"
               dataKey="damage" 
-              stroke="#ff00a0" 
+              stroke={COLORS.damage} 
               strokeWidth={3} 
-              dot={{ r: 5, fill: '#ff00a0', stroke: '#111', strokeWidth: 2 }} 
-              activeDot={{ r: 8, fill: '#fff', stroke: '#ff00a0', strokeWidth: 2 }} 
+              dot={{ r: 5, fill: COLORS.damage, stroke: '#111', strokeWidth: 2 }} 
+              activeDot={{ r: 8, fill: '#fff', stroke: COLORS.damage, strokeWidth: 2 }} 
             />
           </LineChart>
         </ResponsiveContainer>

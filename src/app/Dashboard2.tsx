@@ -14,12 +14,20 @@ import {
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const COLORS = {
+  primaryBar: '#00ffa3', // Green Bar (Kills)
+  secondaryBar: '#000000', // Black Bar (Damage)
+  primaryText: '#00ffa3',
+  secondaryText: '#000000',
+  axisLine: '#000000',
+};
+
 export default function Dashboard2() {
   const { data, error, isLoading } = useSWR('/api/sheet', fetcher, {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-green-500">Loading Live Stats...</div>;
+  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold" style={{ color: COLORS.primaryText }}>Loading Live Stats...</div>;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   // Process data for the chart directly from the API response
@@ -29,8 +37,8 @@ export default function Dashboard2() {
       return {
         name: row.TeamName.trim(), 
         logo: row.LogoUrl, 
-        elims: parseInt(row.Kill) || 0, // Green Bar (Left Y-Axis)
-        damage: parseInt(row.Damage) || 0, // Black Bar (Right Y-Axis)
+        elims: parseInt(row.Kill) || 0, // Primary Bar
+        damage: parseInt(row.Damage) || 0, // Secondary Bar
       };
     });
 
@@ -43,9 +51,9 @@ export default function Dashboard2() {
     return (
       <g transform={`translate(${x},${y})`}>
         {/* Cyan Box Background */}
-        <rect x={-25} y={5} width="50" height="50" fill="#00ffa3" />
+        <rect x={-25} y={5} width="50" height="50" fill={COLORS.primaryBar} />
         {/* Inner black border/box */}
-        <rect x={-23} y={7} width="46" height="46" fill="#000" />
+        <rect x={-23} y={7} width="46" height="46" fill={COLORS.secondaryBar} />
         <image
           href={teamData.logo}
           x={-20}
@@ -56,18 +64,12 @@ export default function Dashboard2() {
             e.target.style.display = 'none';
           }}
         />
-        {/* Hiding the text to match the image which only shows logos inside the boxes */}
       </g>
     );
   };
 
   const CustomBarLabel = (props: any) => {
     const { x, y, width, height, value, textColor } = props;
-    // Y is the top of the bar. height is the bar height.
-    // So y + height is the X-axis line.
-    // If value is 0, height is 0. 
-    // To ensure the text is always above the red line, we can just use the chart's bottom boundary,
-    // but y + height is the safest relative position.
     const bottomY = y + height - 5; 
     
     return (
@@ -87,10 +89,10 @@ export default function Dashboard2() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div style={{ backgroundColor: '#111', padding: '12px', border: '1px solid #00ffa3', borderRadius: '8px' }}>
+        <div style={{ backgroundColor: '#111', padding: '12px', border: `1px solid ${COLORS.primaryBar}`, borderRadius: '8px' }}>
           <p style={{ color: '#fff', fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>{label}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.dataKey === 'damage' ? '#ffffff' : '#00ffa3', margin: '4px 0', fontSize: '14px' }}>
+            <p key={index} style={{ color: entry.dataKey === 'damage' ? '#ffffff' : COLORS.primaryText, margin: '4px 0', fontSize: '14px' }}>
               {entry.name} : {entry.value}
             </p>
           ))}
@@ -109,7 +111,7 @@ export default function Dashboard2() {
           <BarChart
             data={chartData}
             margin={{ top: 60, right: 20, bottom: 80, left: 20 }}
-            barGap={0} // No gap between the green and black bars
+            barGap={0}
           >
             <CartesianGrid stroke="#e0e0e0" vertical={false} />
             
@@ -118,7 +120,7 @@ export default function Dashboard2() {
               orientation="left"
               axisLine={false}
               tickLine={false}
-              tick={{fill: '#00ffa3', fontWeight: 'bold'}}
+              tick={{fill: COLORS.primaryText, fontWeight: 'bold'}}
               tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => Math.max(dataMax * 1.5, 30)]}
             />
@@ -128,7 +130,7 @@ export default function Dashboard2() {
               orientation="right"
               axisLine={false}
               tickLine={false}
-              tick={{fill: '#000', fontWeight: 'bold'}}
+              tick={{fill: COLORS.secondaryText, fontWeight: 'bold'}}
               tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
@@ -137,7 +139,7 @@ export default function Dashboard2() {
               dataKey="name" 
               tick={<CustomXAxisTick />} 
               interval={0} 
-              axisLine={{ stroke: '#000', strokeWidth: 2 }}
+              axisLine={{ stroke: COLORS.axisLine, strokeWidth: 2 }}
               tickLine={false}
             />
             
@@ -146,22 +148,22 @@ export default function Dashboard2() {
               content={<CustomTooltip />}
             />
 
-            {/* Green Bar (Kills) */}
+            {/* Primary Bar (Kills) */}
             <Bar 
               yAxisId="left"
               dataKey="elims" 
               name="Kills"
-              fill="#00ffa3" 
-              label={<CustomBarLabel textColor="#000000" />}
+              fill={COLORS.primaryBar} 
+              label={<CustomBarLabel textColor={COLORS.secondaryText} />}
             />
             
-            {/* Black Bar (Damage) */}
+            {/* Secondary Bar (Damage) */}
             <Bar 
               yAxisId="right"
               dataKey="damage" 
               name="Damage"
-              fill="#000000" 
-              label={<CustomBarLabel textColor="#00ffa3" />}
+              fill={COLORS.secondaryBar} 
+              label={<CustomBarLabel textColor={COLORS.primaryText} />}
             />
           </BarChart>
         </ResponsiveContainer>

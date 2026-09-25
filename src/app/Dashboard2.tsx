@@ -15,7 +15,7 @@ import {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const COLORS = {
-  primaryBar: '#00ffa3', // Green Bar (Kills)
+  primaryBar: '#003cff', // Green Bar (Kills)
   secondaryBar: '#000000', // Black Bar (Damage)
   primaryText: '#00ffa3',
   secondaryText: '#000000',

@@ -101,7 +101,7 @@ export default function MVPStats() {
           <RadarChart 
             cx="50%" 
             cy="50%" 
-            outerRadius="60%" 
+            outerRadius="75%" 
             data={radarData}
             margin={{ top: 100, right: 100, bottom: 100, left: 100 }}
           >
@@ -126,6 +126,7 @@ export default function MVPStats() {
               isAnimationActive={true}
               animationDuration={3000}
               dot={{ r: 6, fill: '#ef4444', stroke: '#ffffff', strokeWidth: 2 }} // Dots at corners
+              className="animate-pulse"
             />
           </RadarChart>
         </ResponsiveContainer>

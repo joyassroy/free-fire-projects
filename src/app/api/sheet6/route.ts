@@ -19,7 +19,7 @@ export async function GET() {
     // 1. Fetch data from Google Sheets
     const sheetResponse = await sheets.spreadsheets.values.get({
       spreadsheetId: process.env.GOOGLE_SHEET_ID,
-      range: 'Vmix!A125:AH126', 
+      range: 'Vmix!A31:AH32', 
     });
 
     const rows = sheetResponse.data.values;

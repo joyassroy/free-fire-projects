@@ -5,6 +5,38 @@ import React, { useEffect, useState } from 'react';
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
+const AnimatedNumber = ({ value }: { value: number }) => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    let startTime: number | null = null;
+    let animationFrameId: number;
+    const duration = 3000;
+
+    const tick = (currentTime: number) => {
+      if (!startTime) startTime = currentTime;
+      const progress = currentTime - startTime;
+      const progressRatio = Math.min(progress / duration, 1);
+      
+      const easeOut = 1 - Math.pow(1 - progressRatio, 3);
+      setCount(Math.floor(value * easeOut));
+
+      if (progressRatio < 1) {
+        animationFrameId = requestAnimationFrame(tick);
+      } else {
+        setCount(value);
+      }
+    };
+
+    animationFrameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [value]);
+
+  return <>{count}</>;
+};
+
+
+
 const StatBar = ({ label, val1, val2 }: { label: string, val1: number, val2: number }) => {
   const [animated, setAnimated] = useState(false);
 
@@ -19,18 +51,6 @@ const StatBar = ({ label, val1, val2 }: { label: string, val1: number, val2: num
 
   return (
     <div className="flex flex-col items-center w-full my-6 relative">
-      {/* Label Banner */}
-      <div 
-        className="z-10 bg-gradient-to-r from-orange-400 via-orange-500 to-orange-400 px-12 py-1 mb-[-12px] shadow-lg border-y-2 border-orange-300"
-        style={{
-          clipPath: 'polygon(8% 0%, 92% 0%, 100% 50%, 92% 100%, 8% 100%, 0% 50%)'
-        }}
-      >
-        <span className="text-white font-black text-2xl tracking-widest" style={{ textShadow: '2px 2px 0 #000' }}>
-          {label}
-        </span>
-      </div>
-
       {/* Bar Container */}
       <div 
         className="w-full flex h-14 bg-gray-900 border-2 border-[#004b87] shadow-2xl relative overflow-hidden"
@@ -43,8 +63,11 @@ const StatBar = ({ label, val1, val2 }: { label: string, val1: number, val2: num
           className="h-full bg-[#004b87] flex items-center px-4 transition-all duration-[3000ms] ease-out"
           style={{ width: animated ? `${p1Width}%` : '50%' }}
         >
-          <span className="text-[#fbd120] font-black text-3xl" style={{ textShadow: '2px 2px 0 #000' }}>
-            {val1}
+          <span 
+            className="text-[#fbd120] font-black text-3xl" 
+            style={{ textShadow: '2px 2px 0 #000' }}
+          >
+            <AnimatedNumber value={val1} />
           </span>
         </div>
 
@@ -54,7 +77,7 @@ const StatBar = ({ label, val1, val2 }: { label: string, val1: number, val2: num
           style={{ width: animated ? `${p2Width}%` : '50%' }}
         >
           <span className="text-[#004b87] font-black text-3xl">
-            {val2}
+            <AnimatedNumber value={val2} />
           </span>
         </div>
         

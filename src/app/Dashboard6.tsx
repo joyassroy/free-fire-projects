@@ -77,17 +77,17 @@ export default function MVPStats() {
           width={110} 
           height={60} 
           rx={8} 
-          fill="#ffffff" 
-          filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.15))"
-          stroke="#e2e8f0"
-          strokeWidth="1"
+          fill="#000000" 
+          filter="drop-shadow(0px 4px 6px rgba(0,0,0,0.3))"
+          stroke="#692fb2"
+          strokeWidth="2"
         />
         {/* Value Text */}
-        <text x={0} y={0} textAnchor="middle" fill="#0f172a" fontSize={26} fontWeight="900">
+        <text x={0} y={0} textAnchor="middle" fill="#ffffff" fontSize={26} fontWeight="900">
           {stat?.valRaw}
         </text>
         {/* Label Text */}
-        <text x={0} y={18} textAnchor="middle" fill="#0284c7" fontSize={11} fontWeight="800" className="tracking-widest">
+        <text x={0} y={18} textAnchor="middle" fill="#692fb2" fontSize={11} fontWeight="800" className="tracking-widest">
           {payload.value}
         </text>
       </g>
@@ -107,7 +107,7 @@ export default function MVPStats() {
           >
             <PolarGrid 
               gridType="polygon" 
-              stroke="#0ea5e9" 
+              stroke="#000000" 
               strokeWidth={1}
             />
             
@@ -119,13 +119,13 @@ export default function MVPStats() {
             <Radar
               name="MVP"
               dataKey="valNorm"
-              stroke="#ef4444" // Red line
+              stroke="#692fb2" // Purple line
               strokeWidth={2}
-              fill="#fca5a5" // Light red fill
+              fill="#692fb2" // Purple fill
               fillOpacity={0.6}
               isAnimationActive={true}
               animationDuration={3000}
-              dot={{ r: 6, fill: '#ef4444', stroke: '#ffffff', strokeWidth: 2 }} // Dots at corners
+              dot={{ r: 6, fill: '#692fb2', stroke: '#000000', strokeWidth: 2 }} // Dots at corners
               className="animate-pulse"
             />
           </RadarChart>

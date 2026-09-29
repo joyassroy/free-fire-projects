@@ -13,8 +13,8 @@ import {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const COLORS = {
-  team1: '#a855f7', // Purple
-  team2: '#eab308', // Yellow
+  team1: '#000000', // Black
+  team2: '#692fb2', // Purple
   lineStroke: '#6b7280', // Gray line connecting the dots
 };
 
@@ -55,7 +55,7 @@ export default function Dashboard5() {
     damage: parseInt(team2Row[7]) || 0,
     headshots: parseInt(team2Row[30]) || 0,
     color: COLORS.team2,
-    textColor: '#000000'
+    textColor: '#ffffff'
   };
 
   // Map values to a specific vertical band to enforce the 'V' shape

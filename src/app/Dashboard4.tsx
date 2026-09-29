@@ -12,10 +12,10 @@ import {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const COLORS = {
-  team1: '#f59e0b', // Orange/Yellow
-  team2: '#3b82f6', // Blue
-  radarTick: '#000000',
-  radarGrid: '#ffffff30',
+  team1: '#000000', // Black
+  team2: '#692fb2', // Purple
+  radarTick: '#692fb2',
+  radarGrid: '#000000',
 };
 
 export default function Dashboard4() {
@@ -121,7 +121,7 @@ export default function Dashboard4() {
         {/* Left Team Stats */}
         <div className="flex flex-col items-end w-64 text-right">
           <div 
-            className="px-6 py-2 font-black text-xl italic tracking-wider shadow-lg transform -skew-x-12 mb-6 text-black"
+            className="px-6 py-2 font-black text-xl italic tracking-wider shadow-lg transform -skew-x-12 mb-6 text-white"
             style={{ backgroundColor: team1.color }}
           >
             <span className="block transform skew-x-12">{team1.name}</span>
@@ -180,7 +180,7 @@ export default function Dashboard4() {
         {/* Right Team Stats */}
         <div className="flex flex-col items-start w-64 text-left">
           <div 
-            className="px-6 py-2 font-black text-xl italic tracking-wider shadow-lg transform -skew-x-12 mb-6 text-black"
+            className="px-6 py-2 font-black text-xl italic tracking-wider shadow-lg transform -skew-x-12 mb-6 text-white"
             style={{ backgroundColor: team2.color }}
           >
             <span className="block transform skew-x-12">{team2.name}</span>

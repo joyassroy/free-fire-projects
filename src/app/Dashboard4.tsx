@@ -68,10 +68,10 @@ export default function Dashboard4() {
   const knockNorm = getNormalized(team1.knockDown, team2.knockDown);
 
   const radarData = [
-    { subject: 'KILL PTS', A: killsNorm.n1, B: killsNorm.n2 },
-    { subject: 'DAMAGE', A: damageNorm.n1, B: damageNorm.n2 },
-    { subject: 'ASSIST', A: assistNorm.n1, B: assistNorm.n2 },
-    { subject: 'KNOCK DOWN', A: knockNorm.n1, B: knockNorm.n2 },
+    { subject: 'KILL PTS', A: killsNorm.n1, B: killsNorm.n2, max: 115 },
+    { subject: 'DAMAGE', A: damageNorm.n1, B: damageNorm.n2, max: 115 },
+    { subject: 'ASSIST', A: assistNorm.n1, B: assistNorm.n2, max: 115 },
+    { subject: 'KNOCK DOWN', A: knockNorm.n1, B: knockNorm.n2, max: 115 },
   ];
 
   const BlinkingDot = (props: any) => {
@@ -138,9 +138,9 @@ export default function Dashboard4() {
         {/* Center Radar Chart */}
         <div className="w-[700px] h-[600px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
-              {/* PolarGrid removed as requested */}
-              
+            <RadarChart cx="50%" cy="50%" outerRadius="52%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
+              {/* Outer boundary box */}
+              <Radar dataKey="max" stroke="#1f2937" fill="none" strokeWidth={2} isAnimationActive={false} />
               {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners pushed further out */}
               <PolarAngleAxis 
                 dataKey="subject" 

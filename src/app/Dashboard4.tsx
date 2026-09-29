@@ -140,7 +140,7 @@ export default function Dashboard4() {
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="52%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
               {/* Outer boundary box */}
-              <Radar dataKey="max" stroke="#1f2937" fill="none" strokeWidth={2} isAnimationActive={false} />
+              <Radar dataKey="max" stroke="#1f2937" fill="none" strokeWidth={2} isAnimationActive={true} animationDuration={3000} />
               {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners pushed further out */}
               <PolarAngleAxis 
                 dataKey="subject" 

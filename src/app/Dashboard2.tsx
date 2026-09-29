@@ -107,7 +107,7 @@ export default function Dashboard2() {
     <div 
       className="w-full min-h-screen p-8 flex flex-col items-center justify-center relative overflow-hidden bg-transparent" 
     >
-      <div className="w-full max-w-6xl h-[600px] z-10 relative">
+      <div className="w-full max-w-[1600px] h-[85vh] min-h-[700px] z-10 relative">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}

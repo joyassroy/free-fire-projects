@@ -17,8 +17,8 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const COLORS = {
   primaryBar: '#000000', // Black Bar (Kills)
   secondaryBar: '#692fb2', // Purple Bar (Damage)
-  primaryText: '#ffffff',
-  secondaryText: '#ffffff',
+  barText: '#ffffff',
+  axisText: '#000000',
   axisLine: '#000000',
 };
 
@@ -93,7 +93,7 @@ export default function Dashboard2() {
         <div style={{ backgroundColor: '#111', padding: '12px', border: `1px solid ${COLORS.primaryBar}`, borderRadius: '8px' }}>
           <p style={{ color: '#fff', fontWeight: 'bold', fontSize: '16px', marginBottom: '8px' }}>{label}</p>
           {payload.map((entry: any, index: number) => (
-            <p key={index} style={{ color: entry.dataKey === 'damage' ? '#ffffff' : COLORS.primaryText, margin: '4px 0', fontSize: '14px' }}>
+            <p key={index} style={{ color: '#ffffff', margin: '4px 0', fontSize: '14px' }}>
               {entry.name} : {entry.value}
             </p>
           ))}
@@ -121,7 +121,7 @@ export default function Dashboard2() {
               orientation="left"
               axisLine={false}
               tickLine={false}
-              tick={{fill: COLORS.primaryText, fontWeight: 'bold'}}
+              tick={{fill: COLORS.axisText, fontWeight: 'bold'}}
               tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => Math.max(dataMax * 1.5, 30)]}
             />
@@ -131,7 +131,7 @@ export default function Dashboard2() {
               orientation="right"
               axisLine={false}
               tickLine={false}
-              tick={{fill: COLORS.secondaryText, fontWeight: 'bold'}}
+              tick={{fill: COLORS.axisText, fontWeight: 'bold'}}
               tickFormatter={(value) => String(Math.round(value))}
               domain={[0, (dataMax: number) => dataMax * 1.1]}
             />
@@ -155,7 +155,7 @@ export default function Dashboard2() {
               dataKey="elims" 
               name="Kills"
               fill={COLORS.primaryBar} 
-              label={<CustomBarLabel textColor={COLORS.secondaryText} />}
+              label={<CustomBarLabel textColor={COLORS.barText} />}
               isAnimationActive={true}
               animationDuration={3000}
             />
@@ -166,7 +166,7 @@ export default function Dashboard2() {
               dataKey="damage" 
               name="Damage"
               fill={COLORS.secondaryBar} 
-              label={<CustomBarLabel textColor={COLORS.primaryText} customFontSize={10} />}
+              label={<CustomBarLabel textColor={COLORS.barText} customFontSize={10} />}
               isAnimationActive={true}
               animationDuration={3000}
             />

@@ -69,8 +69,9 @@ export default function Dashboard2() {
   };
 
   const CustomBarLabel = (props: any) => {
-    const { x, y, width, height, value, textColor } = props;
+    const { x, y, width, height, value, textColor, customFontSize } = props;
     const bottomY = y + height - 5; 
+    const size = customFontSize || 12;
     
     return (
       <text
@@ -78,7 +79,7 @@ export default function Dashboard2() {
         y={bottomY} 
         fill={textColor} 
         textAnchor="middle"
-        fontSize={12}
+        fontSize={size}
         fontWeight="bold"
       >
         {value}
@@ -165,7 +166,7 @@ export default function Dashboard2() {
               dataKey="damage" 
               name="Damage"
               fill={COLORS.secondaryBar} 
-              label={<CustomBarLabel textColor={COLORS.primaryText} />}
+              label={<CustomBarLabel textColor={COLORS.primaryText} customFontSize={10} />}
               isAnimationActive={true}
               animationDuration={3000}
             />

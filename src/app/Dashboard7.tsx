@@ -58,25 +58,22 @@ const StatBar = ({ label, val1, val2 }: { label: string, val1: number, val2: num
           clipPath: 'polygon(1% 0, 100% 0, 99% 100%, 0 100%)'
         }}
       >
-        {/* Left Bar (Dark Blue) */}
+        {/* Left Bar (Black) */}
         <div 
-          className="h-full bg-[#004b87] flex items-center px-4 transition-all duration-[3000ms] ease-out"
+          className="h-full bg-black flex items-center px-4 transition-all duration-[3000ms] ease-out"
           style={{ width: animated ? `${p1Width}%` : '50%' }}
         >
-          <span 
-            className="text-[#fbd120] font-black text-3xl" 
-            style={{ textShadow: '2px 2px 0 #000' }}
-          >
+          <span className="text-white font-black text-3xl">
             <AnimatedNumber value={val1} />
           </span>
         </div>
 
-        {/* Right Bar (Yellow) */}
+        {/* Right Bar (#692fb2) */}
         <div 
-          className="h-full bg-[#fbd120] flex items-center justify-end px-4 transition-all duration-[3000ms] ease-out"
+          className="h-full bg-[#692fb2] flex items-center justify-end px-4 transition-all duration-[3000ms] ease-out"
           style={{ width: animated ? `${p2Width}%` : '50%' }}
         >
-          <span className="text-[#004b87] font-black text-3xl">
+          <span className="text-white font-black text-3xl">
             <AnimatedNumber value={val2} />
           </span>
         </div>
@@ -117,11 +114,11 @@ export default function HeadToHead() {
       
       {/* Players Header */}
       <div className="w-full max-w-4xl flex justify-between items-center mb-8 px-4">
-        <div className="text-4xl font-black text-[#004b87] bg-white px-6 py-2 rounded shadow-xl uppercase border-4 border-[#004b87]">
+        <div className="text-4xl font-black text-black bg-white px-6 py-2 rounded shadow-xl uppercase border-4 border-black">
           {p1[2]}
         </div>
         <div className="text-3xl font-black text-white italic">VS</div>
-        <div className="text-4xl font-black text-[#004b87] bg-[#fbd120] px-6 py-2 rounded shadow-xl uppercase border-4 border-[#004b87]">
+        <div className="text-4xl font-black text-black bg-[#692fb2] px-6 py-2 rounded shadow-xl uppercase border-4 border-black">
           {p2[2]}
         </div>
       </div>

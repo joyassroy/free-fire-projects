@@ -27,7 +27,7 @@ export default function Dashboard() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-purple-400">Loading Live Stats...</div>;
+  if (isLoading) return null;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   // Process data for the chart directly from the API response
@@ -171,6 +171,8 @@ export default function Dashboard() {
               barSize={40} 
               shape={<CustomBar />}
               label={<CustomBarLabel />}
+              isAnimationActive={true}
+              animationDuration={3000}
             />
             
             <Line 
@@ -182,6 +184,8 @@ export default function Dashboard() {
               dot={{ r: 5, fill: COLORS.lineStroke, stroke: '#000', strokeWidth: 2 }}
               activeDot={{ r: 8, fill: '#fff', stroke: COLORS.lineStroke }}
               label={<CustomLineLabel />}
+              isAnimationActive={true}
+              animationDuration={3000}
             />
           </ComposedChart>
         </ResponsiveContainer>

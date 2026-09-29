@@ -23,7 +23,7 @@ export default function Dashboard5() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-orange-400">Loading Live Stats...</div>;
+  if (isLoading) return null;
   if (error || !data?.data || data.data.length < 2) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   const team1Row = data.data[0];
@@ -186,6 +186,8 @@ export default function Dashboard5() {
                   isTop={props.payload.team1 >= props.payload.team2}
                 />
               )} 
+              isAnimationActive={true}
+              animationDuration={3000}
             />
             
             {/* Team 2 Line (Yellow) */}
@@ -202,6 +204,8 @@ export default function Dashboard5() {
                   isTop={props.payload.team2 > props.payload.team1}
                 />
               )} 
+              isAnimationActive={true}
+              animationDuration={3000}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -23,7 +23,7 @@ export default function Dashboard4() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold text-orange-400">Loading Live Stats...</div>;
+  if (isLoading) return null;
   if (error || !data?.data || data.data.length < 2) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   const team1Row = data.data[0];
@@ -157,6 +157,8 @@ export default function Dashboard4() {
                 fillOpacity={0.6}
                 strokeWidth={1.5}
                 dot={<BlinkingDot fill={team1.color} />}
+                isAnimationActive={true}
+                animationDuration={3000}
               />
               
               {/* Radar for Team 2 */}
@@ -168,6 +170,8 @@ export default function Dashboard4() {
                 fillOpacity={0.6}
                 strokeWidth={1.5}
                 dot={<BlinkingDot fill={team2.color} />}
+                isAnimationActive={true}
+                animationDuration={3000}
               />
             </RadarChart>
           </ResponsiveContainer>

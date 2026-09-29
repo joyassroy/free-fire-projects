@@ -27,7 +27,7 @@ export default function Dashboard3() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold" style={{ color: COLORS.killPoints }}>Loading Live Stats...</div>;
+  if (isLoading) return null;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   const chartData = (data?.data || [])
@@ -172,6 +172,8 @@ export default function Dashboard3() {
               strokeWidth={3} 
               dot={<BlinkingDot fill={COLORS.killPoints} />} 
               activeDot={{ r: 8, fill: '#fff', stroke: COLORS.killPoints, strokeWidth: 2 }} 
+              isAnimationActive={true}
+              animationDuration={3000}
             />
             
             {/* Survival Score Line */}
@@ -184,6 +186,8 @@ export default function Dashboard3() {
               strokeWidth={3} 
               dot={{ r: 5, fill: COLORS.survivalScore, stroke: '#111', strokeWidth: 2 }} 
               activeDot={{ r: 8, fill: '#fff', stroke: COLORS.survivalScore, strokeWidth: 2 }} 
+              isAnimationActive={true}
+              animationDuration={3000}
             />
             
             {/* Damage Line (on Right Axis) */}
@@ -196,6 +200,8 @@ export default function Dashboard3() {
               strokeWidth={3} 
               dot={{ r: 5, fill: COLORS.damage, stroke: '#111', strokeWidth: 2 }} 
               activeDot={{ r: 8, fill: '#fff', stroke: COLORS.damage, strokeWidth: 2 }} 
+              isAnimationActive={true}
+              animationDuration={3000}
             />
           </LineChart>
         </ResponsiveContainer>

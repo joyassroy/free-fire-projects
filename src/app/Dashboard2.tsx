@@ -27,7 +27,7 @@ export default function Dashboard2() {
     refreshInterval: 5000,
   });
 
-  if (isLoading) return <div className="flex h-screen items-center justify-center text-2xl font-bold" style={{ color: COLORS.primaryText }}>Loading Live Stats...</div>;
+  if (isLoading) return null;
   if (error) return <div className="flex h-screen items-center justify-center text-red-500">Error loading data.</div>;
 
   // Process data for the chart directly from the API response
@@ -155,6 +155,8 @@ export default function Dashboard2() {
               name="Kills"
               fill={COLORS.primaryBar} 
               label={<CustomBarLabel textColor={COLORS.secondaryText} />}
+              isAnimationActive={true}
+              animationDuration={3000}
             />
             
             {/* Secondary Bar (Damage) */}
@@ -164,6 +166,8 @@ export default function Dashboard2() {
               name="Damage"
               fill={COLORS.secondaryBar} 
               label={<CustomBarLabel textColor={COLORS.primaryText} />}
+              isAnimationActive={true}
+              animationDuration={3000}
             />
           </BarChart>
         </ResponsiveContainer>

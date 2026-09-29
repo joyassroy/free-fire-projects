@@ -12,10 +12,10 @@ import {
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const COLORS = {
-  team1: '#000000', // Black
+  team1: '#1f2937', // Black
   team2: '#692fb2', // Purple
   radarTick: '#692fb2',
-  radarGrid: '#000000',
+  radarGrid: '#1f2937',
 };
 
 export default function Dashboard4() {
@@ -139,8 +139,7 @@ export default function Dashboard4() {
         <div className="w-[700px] h-[600px]">
           <ResponsiveContainer width="100%" height="100%">
             <RadarChart cx="50%" cy="50%" outerRadius="45%" data={radarData} margin={{ top: 20, right: 80, bottom: 20, left: 80 }}>
-              {/* PolarGrid styles the spider web lines */}
-              <PolarGrid stroke={COLORS.radarGrid} />
+              {/* PolarGrid removed as requested */}
               
               {/* The labels (KILL PTS, DAMAGE, etc.) at the 4 corners pushed further out */}
               <PolarAngleAxis 
